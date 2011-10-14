@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings">Settings</string>
+    <string name="help">Help</string>
+
+    <string name="ok">OK</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="edit">Edit</string>
+
+    <string name="bluetooth.scan_on_battery">A Bluetooth scan requires a lot of power. Perform scan while on battery power?</string>
+    <string name="button.scan">Scan For Devices</string>
+    <string name="button.cancel_scan">Cancel Scan</string>
+    <string name="bluetooth.scan_in_progress">Scanning Bluetooth</string>
+    
+    <!-- Bluetooth related messages -->
+    <string name="bluetooth.unavailable">No Bluetooth device available on device. Exiting.</string>
+    <string name="bluetooth.not_enabled">Bluetooth not enabled. Exiting</string>
+    <string name="bluetooth.unexpected_error">Unexpected Bluetooth error. Exiting.</string>
+        
+    <string name="bluetooth.connecting">Connecting...</string>
+    <string name="bluetooth.connected">Connected</string>
+    <string name="bluetooth.connection_error">Connection failed</string>
+    <string name="bluetooth.not_connected">Not connected</string>
+
+    <string name="bluetooth.connection_error_toast">Failed to communicate with bluetooth device.</string>
+    
+</resources>
