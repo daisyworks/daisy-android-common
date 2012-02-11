@@ -11,31 +11,31 @@ public final class R {
     public static final class attr {
     }
     public static final class id {
-        public static final int help_webview=0x7f040000;
+        public static int help_webview=0x7f040000;
     }
     public static final class layout {
-        public static final int help=0x7f020000;
+        public static int help=0x7f020000;
     }
     public static final class string {
-        public static final int bluetooth_connected=0x7f03000e;
-        public static final int bluetooth_connecting=0x7f03000d;
-        public static final int bluetooth_connection_error=0x7f03000f;
-        public static final int bluetooth_connection_error_toast=0x7f030011;
-        public static final int bluetooth_not_connected=0x7f030010;
-        public static final int bluetooth_not_enabled=0x7f03000b;
-        public static final int bluetooth_scan_in_progress=0x7f030009;
-        public static final int bluetooth_scan_on_battery=0x7f030006;
+        public static int bluetooth_connected=0x7f03000e;
+        public static int bluetooth_connecting=0x7f03000d;
+        public static int bluetooth_connection_error=0x7f03000f;
+        public static int bluetooth_connection_error_toast=0x7f030011;
+        public static int bluetooth_not_connected=0x7f030010;
+        public static int bluetooth_not_enabled=0x7f03000b;
+        public static int bluetooth_scan_in_progress=0x7f030009;
+        public static int bluetooth_scan_on_battery=0x7f030006;
         /**  Bluetooth related messages 
          */
-        public static final int bluetooth_unavailable=0x7f03000a;
-        public static final int bluetooth_unexpected_error=0x7f03000c;
-        public static final int button_cancel_scan=0x7f030008;
-        public static final int button_scan=0x7f030007;
-        public static final int edit=0x7f030005;
-        public static final int help=0x7f030001;
-        public static final int no=0x7f030004;
-        public static final int ok=0x7f030002;
-        public static final int settings=0x7f030000;
-        public static final int yes=0x7f030003;
+        public static int bluetooth_unavailable=0x7f03000a;
+        public static int bluetooth_unexpected_error=0x7f03000c;
+        public static int button_cancel_scan=0x7f030008;
+        public static int button_scan=0x7f030007;
+        public static int edit=0x7f030005;
+        public static int help=0x7f030001;
+        public static int no=0x7f030004;
+        public static int ok=0x7f030002;
+        public static int settings=0x7f030000;
+        public static int yes=0x7f030003;
     }
 }
