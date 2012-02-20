@@ -2,16 +2,17 @@ package com.daisyworks.android;
 
 public class ThreadUtil
 {
-  public static void waitUntil(final long time) throws InterruptedException
+  public static void waitUntil(final long time)
   {
-    long currentTime = System.currentTimeMillis();
-    while (currentTime < time)
+    long current;
+    while ((current = System.currentTimeMillis()) < time)
+    try
     {
-      synchronized(ThreadUtil.class)
-      {
-        ThreadUtil.class.wait(time - currentTime);
-      }
-      currentTime = System.currentTimeMillis();
+      Thread.sleep(time - current);
+    }
+    catch(final InterruptedException ie)
+    {
+      Thread.currentThread().interrupt();
     }
   }
 }
