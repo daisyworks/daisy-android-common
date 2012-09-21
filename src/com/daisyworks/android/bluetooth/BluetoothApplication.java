@@ -19,12 +19,16 @@
 */
 package com.daisyworks.android.bluetooth;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import android.app.Application;
 import android.os.Handler;
+import android.util.Log;
 
 public class BluetoothApplication extends Application
 {
-  protected BTCommThread btCommThread = null;
+  private Map<String, BTCommThread> devices = new HashMap<String, BTCommThread>();
 
   @Override
   public void onCreate ()
@@ -37,21 +41,29 @@ public class BluetoothApplication extends Application
   {
     super.onLowMemory();
   }
+  
+  public Map<String, BTCommThread> getDevices() {
+	  return devices;
+  }
 
   public BTCommThread getBtCommThreadforNewActivity(final Handler handler,
                                                     final String deviceId,
                                                     final long timeout,
-                                                    final BluetoothAction initialAction)
+                                                    final BluetoothAction[] initialActions)
   {
+	BTCommThread btCommThread = devices.get(deviceId);
     if (btCommThread == null || btCommThread.isShutdown())
     {
-      btCommThread = new BTCommThread(handler, deviceId, timeout, initialAction);
+      btCommThread = new BTCommThread(handler, deviceId, timeout, initialActions);
       btCommThread.start();
+      devices.put(deviceId, btCommThread);
     }
     else
     {
       btCommThread.newActivity(handler, timeout);
     }
+    
+    if (BTCommThread.DEBUG_BLUETOOTH) Log.d("BluetoothApplication", "new deviceId: " + deviceId + ", existing " + btCommThread.deviceAddress);
 
     return btCommThread;
   }
@@ -60,10 +72,9 @@ public class BluetoothApplication extends Application
   public void onTerminate ()
   {
     super.onTerminate();
-
-    if (btCommThread != null)
-    {
-      btCommThread.shutdown();
+    
+    for (BTCommThread t : devices.values()) {
+    	t.shutdown();
     }
   }
 }

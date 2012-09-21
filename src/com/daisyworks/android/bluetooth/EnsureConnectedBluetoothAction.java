@@ -16,32 +16,31 @@
     If not, see <http://www.gnu.org/licenses/>.
 
     Copyright 2011 DaisyWorks, Inc
-*/
+ */
 package com.daisyworks.android.bluetooth;
 
 import java.io.IOException;
-import java.io.OutputStream;
 
 import android.os.Handler;
+import android.util.Log;
 
-public class EnsureConnectedBluetoothAction implements BluetoothAction
-{
-  public static EnsureConnectedBluetoothAction INSTANCE = new EnsureConnectedBluetoothAction();
+public class EnsureConnectedBluetoothAction extends BaseBluetoothAction {
 
-  private EnsureConnectedBluetoothAction()
-  {
-    // make sure we only have one instance
-  }
+	@Override
+	protected void performIOAction(final AsyncReader reader, final Handler handler) throws IOException {
+		if (BTCommThread.DEBUG_BLUETOOTH)
+			Log.i(BTCommThread.LOG_TAG, "BlueTooth initiating communication");
 
-  @Override
-  public void performAction (final Handler handler, final AsyncReader reader, final OutputStream out) throws IOException
-  {
-    // does nothing
-  }
+		write("\n");
+		String result = reader.readLine(1000);
 
-  @Override
-  public String getRedundancyTag ()
-  {
-    return getClass().getName();
-  }
+		if (!"?\r\n".equalsIgnoreCase(result)) {
+			if (BTCommThread.DEBUG_BLUETOOTH)
+				Log.d(BTCommThread.LOG_TAG, "Expected '?', was: " + result);
+
+			handler.obtainMessage(BTCommThread.BLUETOOTH_CONNECTION_ERROR).sendToTarget();
+			// return;
+			throw new IOException("Expected '?', was: " + result);
+		}
+	}
 }

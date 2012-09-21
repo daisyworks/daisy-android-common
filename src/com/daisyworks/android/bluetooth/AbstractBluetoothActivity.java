@@ -136,9 +136,9 @@ public class AbstractBluetoothActivity extends Activity
   public BTCommThread getBtCommThreadforNewActivity(final Handler handler,
                                                     final String deviceId,
                                                     final long timeout,
-                                                    final BluetoothAction initialAction)
+                                                    final BluetoothAction[] initialActions)
   {
-    return ((BluetoothApplication)getApplication()).getBtCommThreadforNewActivity(handler, deviceId, timeout, initialAction);
+    return ((BluetoothApplication)getApplication()).getBtCommThreadforNewActivity(handler, deviceId, timeout, initialActions);
   }
 
   protected class BaseCommHandler extends Handler

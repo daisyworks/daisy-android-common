@@ -55,7 +55,7 @@ public class AsyncReaderThread extends Thread implements AsyncReader
       final int read = reader.read(readBuffer);
       if (read == -1)
       {
-        Log.i(LOG_TAG, "read returned -1");
+        if (BTCommThread.DEBUG_BLUETOOTH) Log.i(LOG_TAG, "read returned -1");
         return buf == null ? null : buf.toString();
       }
 
@@ -68,7 +68,7 @@ public class AsyncReaderThread extends Thread implements AsyncReader
 
       if (readBuffer[read - 1] == '\n')
       {
-        Log.i(LOG_TAG, "read ended in newline");
+    	  if (BTCommThread.DEBUG_BLUETOOTH) Log.i(LOG_TAG, "read ended in newline");
         return buf.toString();
       }
     }
@@ -88,7 +88,7 @@ public class AsyncReaderThread extends Thread implements AsyncReader
       {
         if (!shutdown.get())
         {
-          Log.e(LOG_TAG, "Error reading input", ioe);
+        	if (BTCommThread.DEBUG_BLUETOOTH) Log.e(LOG_TAG, "Error reading input", ioe);
           shutdown.set(true);
           exception = ioe;
         }

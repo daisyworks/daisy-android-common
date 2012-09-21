@@ -27,6 +27,7 @@ import android.util.Log;
 
 public abstract class BaseBluetoothAction implements BluetoothAction
 {
+	  
   private OutputStream out;
 
   @Override

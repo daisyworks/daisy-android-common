@@ -37,6 +37,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.widget.ImageView;
 
+import com.daisyworks.android.bluetooth.BTCommThread;
 import com.daisyworks.android.io.FlushedInputStream;
 
 /**
@@ -204,11 +205,11 @@ public class ImageDownloader
     }
     catch (IOException e)
     {
-      Log.w(LOG_TAG, "I/O error while retrieving bitmap from " + url, e);
+    	if (BTCommThread.DEBUG_BLUETOOTH) Log.w(LOG_TAG, "I/O error while retrieving bitmap from " + url, e);
     }
     catch (Exception e)
     {
-      Log.w(LOG_TAG, "Error while retrieving bitmap from " + url, e);
+    	if (BTCommThread.DEBUG_BLUETOOTH) Log.w(LOG_TAG, "Error while retrieving bitmap from " + url, e);
     }
 
     return null;

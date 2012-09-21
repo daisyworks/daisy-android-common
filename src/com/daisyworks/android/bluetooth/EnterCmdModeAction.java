@@ -16,7 +16,7 @@
     If not, see <http://www.gnu.org/licenses/>.
 
     Copyright 2011 DaisyWorks, Inc
-*/
+ */
 package com.daisyworks.android.bluetooth;
 
 import java.io.IOException;
@@ -24,31 +24,26 @@ import java.io.IOException;
 import android.os.Handler;
 import android.util.Log;
 
-public class EnterCmdModeAction extends BaseBluetoothAction
-{
-  @Override
-  protected void performIOAction (final AsyncReader reader,
-                                  final Handler handler)
-    throws IOException
-  {
-    if (BTCommThread.DEBUG_BLUETOOTH) Log.i(BTCommThread.LOG_TAG, "BlueTooth initiating communication");
+public class EnterCmdModeAction extends BaseBluetoothAction {
+	@Override
+	protected void performIOAction(final AsyncReader reader, final Handler handler) throws IOException {
+		if (BTCommThread.DEBUG_BLUETOOTH)
+			Log.i(BTCommThread.LOG_TAG, "BlueTooth initiating communication");
 
-    write("$$$");
-    String result = reader.readLine(1000);
+		write("$$$");
+		String result = reader.readLine(1000);
 
-    if (!"CMD\r\n".equalsIgnoreCase(result))
-    {
-      handler.obtainMessage(BTCommThread.BLUETOOTH_CONNECTION_ERROR).sendToTarget();
-      return;
-    }
+		if (!"CMD\r\n".equalsIgnoreCase(result)) {
+			handler.obtainMessage(BTCommThread.BLUETOOTH_CONNECTION_ERROR).sendToTarget();
+			throw new IOException("Error entering command mode, expected 'CMD', was: " + result);
+		}
 
-    write("ST,255\n");
-    result = reader.readLine(1000);
+		write("ST,255\n");
+		result = reader.readLine(1000);
 
-    if (!"AOK\r\n".equalsIgnoreCase(result))
-    {
-      handler.obtainMessage(BTCommThread.BLUETOOTH_CONNECTION_ERROR).sendToTarget();
-      return;
-    }
-  }
+		if (!"AOK\r\n".equalsIgnoreCase(result)) {
+			handler.obtainMessage(BTCommThread.BLUETOOTH_CONNECTION_ERROR).sendToTarget();
+			throw new IOException("Error setting config timer to unlimited, expected 'AOK', was: " + result);
+		}
+	}
 }
