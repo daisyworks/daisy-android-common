@@ -74,16 +74,6 @@ public class BTCommThread extends Thread {
 		this.deviceAddress = deviceAddress;
 	}
 
-	// public void enterCmdMode()
-	// {
-	// enqueueAction(new SetupThenEnterSerialModeAction());
-	// }
-
-	// public void sendCommand(final String command)
-	// {
-	// enqueueAction(new SendCommandAction(command));
-	// }
-
 	public void enqueueAction(final BluetoothAction action) {
 		if (shutdown.get()) {
 			return;
@@ -126,7 +116,8 @@ public class BTCommThread extends Thread {
 	}
 
 	void performDeviceConnect() {
-		btAdapter.cancelDiscovery();
+		if (btAdapter.isDiscovering())
+			btAdapter.cancelDiscovery();
 		closeSocket();
 
 		sendMessage(BLUETOOTH_START_CONNECT);
@@ -151,6 +142,7 @@ public class BTCommThread extends Thread {
 				}
 			}
 		} catch (final Exception e) {
+			closeSocket();
 			socket = null;
 			if (BTCommThread.DEBUG_BLUETOOTH)
 				Log.e(LOG_TAG, "Bluetooth " + deviceAddress + " Connection failed", e);
@@ -161,47 +153,59 @@ public class BTCommThread extends Thread {
 	@Override
 	public void run() {
 		long lastActionPerformed = System.currentTimeMillis();
-		while (!shutdown.get()) {
-			BluetoothAction nextAction = null;
-			synchronized (actionQueue) {
-				if (!actionQueue.isEmpty()) {
-					nextAction = actionQueue.removeFirst();
-				} else {
-					try {
-						if (timeout.get() > 0) {
-							actionQueue.wait(timeout.get());
-						} else {
-							actionQueue.wait();
-						}
-					} catch (final InterruptedException ie) {
-						Thread.interrupted();
-						shutdown.set(true);
-					}
-				}
-			}
+		try {
+			if (BTCommThread.DEBUG_BLUETOOTH)
+				Log.d(LOG_TAG, "BTCommThread thread started " + deviceAddress);
 
-			synchronized (BTCommThread.class) {
-				if (nextAction != null) {
-					if (BTCommThread.DEBUG_BLUETOOTH)
-						Log.i(LOG_TAG, "Performing action " + deviceAddress + ": " + nextAction.getClass());
-
-					if (!isConnected()) {
-						performDeviceConnect();
-					}
-					if (isConnected()) {
+			while (!shutdown.get()) {
+				BluetoothAction nextAction = null;
+				synchronized (actionQueue) {
+					if (!actionQueue.isEmpty()) {
+						nextAction = actionQueue.removeFirst();
+					} else {
 						try {
-							nextAction.performAction(handler, readerThread, out);
-						} catch (final IOException ioe) {
-							closeSocket();
+							if (timeout.get() > 0) {
+								actionQueue.wait(timeout.get());
+							} else {
+								actionQueue.wait();
+							}
+						} catch (final InterruptedException ie) {
+							Thread.interrupted();
+							shutdown.set(true);
 						}
 					}
-					lastActionPerformed = System.currentTimeMillis();
-				} else if (timeout.get() > 0 && (lastActionPerformed + timeout.get() < System.currentTimeMillis())) {
-					closeSocket();
+				}
+
+				synchronized (BTCommThread.class) {
+					if (nextAction != null) {
+						if (BTCommThread.DEBUG_BLUETOOTH)
+							Log.i(LOG_TAG, "Performing action " + deviceAddress + ": " + nextAction.getClass());
+
+						if (!isConnected()) {
+							performDeviceConnect();
+						}
+						if (isConnected()) {
+							try {
+								nextAction.performAction(handler, readerThread, out);
+							} catch (final IOException ioe) {
+								if (BTCommThread.DEBUG_BLUETOOTH)
+									Log.e(LOG_TAG,
+											"Failed performing action " + deviceAddress + ": " + nextAction.getClass());
+								closeSocket();
+							}
+						}
+						lastActionPerformed = System.currentTimeMillis();
+					} else if (timeout.get() > 0 && (lastActionPerformed + timeout.get() < System.currentTimeMillis())) {
+						closeSocket();
+					}
 				}
 			}
+		} finally {
+			if (BTCommThread.DEBUG_BLUETOOTH)
+				Log.d(LOG_TAG, "BTCommThread thread shutdown " + deviceAddress);
+
+			closeSocket();
 		}
-		closeSocket();
 	}
 
 	private void sendMessage(final int message) {
@@ -238,25 +242,29 @@ public class BTCommThread extends Thread {
 	}
 
 	protected void closeSocket() {
-		synchronized (socketLock) {
-			if (readerThread != null) {
-				readerThread.shutdown();
-			}
-			readerThread = null;
-			out = null;
-			if (socket != null) {
-				if (DEBUG_BLUETOOTH)
-					Log.i(LOG_TAG, "Closing bluetooth socket " + deviceAddress);
-
-				try {
-					socket.close();
-				} catch (IOException e) {
-					if (DEBUG_BLUETOOTH)
-						Log.e(LOG_TAG, "Error closing bluetooth socket " + deviceAddress, e);
+		try {
+			synchronized (socketLock) {
+				if (readerThread != null) {
+					readerThread.shutdown();
 				}
-				socket = null;
+				readerThread = null;
+				out = null;
+				if (socket != null) {
+					if (DEBUG_BLUETOOTH)
+						Log.i(LOG_TAG, "Closing bluetooth socket " + deviceAddress);
+
+					socket.close();
+				} else {
+					if (DEBUG_BLUETOOTH)
+						Log.d(LOG_TAG, "Bluetooth socket already closed " + deviceAddress);
+				}
 			}
+			sendMessage(BLUETOOTH_CONNECTION_CLOSED);
+		} catch (Exception e) {
+			if (DEBUG_BLUETOOTH)
+				Log.e(LOG_TAG, "Error closing bluetooth socket " + deviceAddress, e);
+		} finally {
+			socket = null;
 		}
-		sendMessage(BLUETOOTH_CONNECTION_CLOSED);
 	}
 }
